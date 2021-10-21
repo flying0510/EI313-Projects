@@ -1,0 +1,118 @@
+\documentclass[UTF8,12pt]{ctexart}
+\CTEXsetup[format={\Large\bfseries}]{section}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage[a4paper,top=3cm,bottom=2cm,left=2cm,right=2.5cm]{geometry}
+\usepackage{caption}
+\usepackage{enumerate}
+\usepackage[nottoc]{tocbibind}
+\usepackage{indentfirst}
+\usepackage{ctex}
+\usepackage{fancyhdr}
+\usepackage{bm}
+\usepackage{siunitx}
+\usepackage{amssymb}
+\usepackage{draftwatermark}
+\usepackage{everypage}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{pgfplots}
+\usepackage{marvosym}
+\usepackage{color}
+\def\equationautorefname{}
+\floatname{algorithm}{Algorithm: }
+\renewcommand{\algorithmicrequire}{\textbf{Input：}}
+\renewcommand{\algorithmicensure}{\textbf{Output：}}
+
+\SetWatermarkText{}
+\SetWatermarkLightness{0.92}
+\SetWatermarkScale{0.49}
+\pagestyle{fancy}
+\numberwithin{equation}{section}
+\CTEXoptions[today=old]
+\captionsetup[figure]{name={Fig.}}
+\title{\heiti \textbf{EI313\ Homework 1}}
+\author{\kaishu 杨凯翔 519030910240, \href{mailto: flying_feixiang@sjtu.edu.cn}{\underline{flying\_feixiang@sjtu.edu.cn}}}
+\bibliographystyle{plain}
+\begin{document}
+\maketitle
+
+\thispagestyle{fancy}
+\fancyhead{}
+\lhead{\bfseries SJTU EI313, Autumn, 2021}
+\rhead{\bfseries 工科创作业1}
+\lfoot{}
+\cfoot{\zihao{5}\copyright \ 2021 Kaixiang Yang. All Rights Reserved.}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\zihao{4}
+\heiti
+\section{Work}
+In this homework, we need to install a simple vm which is different from our hostOS, and my hostOS is Win10, so I try to install ubuntu-20.10 vm by VMware.
+
+First, SJTU has provided us with formal VMware Workstation and I have registered and got serial number in the last semester.
+
+We also need *.iso file to install a vm in VMware, and we can acquire that from official website
+\url{https://ubuntu.com/download/desktop}, or other mirror sites.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1.0]{6.png}
+    \caption{*.iso file}
+\end{figure}
+Then I create a vm and install ubuntu-20.10 as follows:
+\begin{figure}[H]
+    \centering
+    \subfigure[pic1.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{2.png}
+    %\caption{fig1}
+    \end{minipage}%
+    }%
+    \subfigure[pic2.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{3.png}
+    %\caption{fig2}
+    \end{minipage}%
+    }%
+    \subfigure[pic3.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{4.png}
+    %\caption{fig2}
+    \end{minipage}
+    }%
+    \subfigure[pic4.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{5.png}
+    %\caption{fig2}
+    \end{minipage}
+    }%
+    \centering
+    \caption{Procedure}
+\end{figure}
+
+And then just follow instructions to install OS.
+Finally, I made it.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{1.png}
+    \caption{ubuntu-20.10 vm}
+\end{figure}
+
+\section{Afterwards}
+Because I usually use WSL(ubuntu18.04) in my study to compile and run C/CPP program, I have been familiar with ubuntu terminal to some degree.
+It will help for the next homework. 
+
+And I will install a second OS in my host, using that iso file, to work on the following homeworks conveniently, and can also learn more knowledge from a linux system.
+
+\end{document} 
