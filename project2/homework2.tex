@@ -1,0 +1,477 @@
+\documentclass[UTF8,12pt]{ctexart}
+\CTEXsetup[format={\Large\bfseries}]{section}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage[a4paper,top=2cm,bottom=1.5cm,left=2cm,right=2.5cm]{geometry}
+\usepackage{caption}
+\usepackage{enumerate}
+\usepackage[nottoc]{tocbibind}
+\usepackage{indentfirst}
+\usepackage{ctex}
+\usepackage{fancyhdr}
+\usepackage{bm}
+\usepackage{siunitx}
+\usepackage{amssymb}
+\usepackage{draftwatermark}
+\usepackage{everypage}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{pgfplots}
+\usepackage{marvosym}
+\usepackage{color}
+\usepackage{listings}
+\lstset{
+    %行号
+    numbers=left,
+      %背景框
+      framexleftmargin=10mm,
+      frame=none,
+     %背景色
+     %backgroundcolor=\color[rgb]{1,1,0.76},
+     backgroundcolor=\color[RGB]{255,245,244},
+     %样式
+     %keywordstyle=\bf\color{blue},
+     %identifierstyle=\bf,
+     %numberstyle=\color[RGB]{0,192,192},
+     %commentstyle=\it\color[RGB]{0,96,96},   
+     %stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},
+     %显示空格
+     %showstringspaces=false
+}
+\def\equationautorefname{}
+\floatname{algorithm}{Algorithm: }
+\renewcommand{\algorithmicrequire}{\textbf{Input：}}
+\renewcommand{\algorithmicensure}{\textbf{Output：}}
+\def\figureautorefname{图}
+\def\tableautorefname{表}%
+\SetWatermarkText{}
+\SetWatermarkLightness{0.92}
+\SetWatermarkScale{0.49}
+\pagestyle{fancy}
+\numberwithin{equation}{section}
+\CTEXoptions[today=old]
+%\captionsetup[figure]{name={Fig.}}
+\title{\heiti \textbf{EI313\ 课程大作业二}}
+\author{\kaishu 杨凯翔 519030910240, \href{mailto: flying_feixiang@sjtu.edu.cn}{\underline{flying\_feixiang@sjtu.edu.cn}}}
+\bibliographystyle{plain}
+\begin{document}
+\maketitle
+
+\thispagestyle{fancy}
+\fancyhead{}
+\lhead{\bfseries SJTU EI313, Autumn, 2021}
+\rhead{\bfseries 工科创作业2}
+\lfoot{}
+\cfoot{\zihao{5}\copyright \ 2021 Kaixiang Yang. All Rights Reserved.}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\zihao{5}
+\heiti
+\section{作业内容}
+\begin{enumerate}
+    \item 从官网下载 QEMU5.2.0 并编译
+    \item 利用 QEMU 创建两个虚拟机并设置为 tap 网络模式，虚拟网卡类型分别为：e1000 和 virtio-net
+    \item 通过 VNC viewer 或者 SSH 连接虚拟机
+    \item 比较两种有着不同种虚拟网卡的虚拟机和主机之间的网络性能
+\end{enumerate}
+\indent 由于 tap 网络模式通过网桥将虚拟网卡与主机网卡相连，所以虚拟机都是通过主机的网卡访问外网，所以我们需要测试两种虚拟机和主机间的网络性能。
+为了便日后学习与研究，我安装了ubuntu双系统，并在 ubuntu 上完成作业内容。
+\section{安装双系统}
+\begin{enumerate}
+    \item 选择 ubuntu-20.10 来安装，从官网下载镜像 (\url{https://ubuntu.com/download/desktop}) 并用 Rufus 工具制作系统盘如\autoref{fig1}所示。
+    \item 划分磁盘空间，因为我的电脑有两块盘（C盘为固态，D盘为机械），所以采用如\autoref{fig2}所示的分区方式，在C盘划分的空间作为EFI引导区（开机时可以选择进入哪个系统），在D盘分配256G的空间。
+    \item 从U盘启动安装系统，自定义安装在已划分好的空间（freespace）/home, /boot 等分区可以按需选择（这里我只分了swap交换区和根目录），并选择C盘的那部分空间作为引导，安装系统。
+\end{enumerate}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.3]{picture/0.png}
+    \caption{制作系统盘}
+    \label{fig1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.5]{picture/0-1.png}
+    \caption{划分磁盘空间}
+    \label{fig2}
+\end{figure}
+\section{下载并编译安装QEMU}
+首先通过官网下载所需版本的 QEMU (\url{https://download.qemu.org/qemu-5.2.0.tar.xz}) 并通过命令行解压。
+\begin{lstlisting}
+$ xz -d qemu-5.2.0.tar.xz
+$ tar -xvf qemu-5.2.0.tar
+\end{lstlisting}
+\begin{figure}[H]
+    \centering
+    \subfigure[pic1.]{
+    \begin{minipage}[t]{0.5\linewidth}
+    \centering
+    \includegraphics[width=2.5in]{picture/1.png}
+    %\caption{fig1}
+    \end{minipage}%
+    }%
+    \subfigure[pic2.]{
+    \begin{minipage}[t]{0.5\linewidth}
+    \centering
+    \includegraphics[width=2.5in]{picture/2.png}
+    %\caption{fig2}
+    \end{minipage}%
+    }%
+    \caption{Download}
+\end{figure}
+\subsection{安装一些工具及依赖包}
+鉴于 ubuntu 系统是新安装的，很多软件等都没有安装，下面首先安装本次作业内容所需要的。
+\begin{lstlisting}
+$ sudo apt-get update
+$ sudo apt-get install gcc
+$ sudo apt-get install make
+$ sudo apt-get install python3
+\end{lstlisting}
+在尝试配置、编译 QEMU 时，会报告一些错误，针对这些错误安装相应的内容：
+
+\noindent \textbf{\color[RGB]{255,30,30}{ERROR: Cannot find Ninja}}
+\begin{lstlisting}
+$ sudo apt-get install ninja-build
+$ sudo apt-get install build-essential
+\end{lstlisting}
+\textbf{\color[RGB]{255,30,30}{ERROR: glib-2.48 gthread-2.0 is required to compile QEMU}}
+\begin{lstlisting}
+$ apt-cache search glib2
+$ sudo apt-get install libglib2.0
+\end{lstlisting}
+\textbf{\color[RGB]{255,30,30}{Unable to locate package libpixman-1-0-dev}}
+\begin{lstlisting}
+$ sudo apt-get install libpixman-1-dev
+\end{lstlisting}
+此时编译安装 qemu 安装虚拟机后会出现提示：\textbf{VNC Server running on 127.0.0.1:5900...}
+
+这是由缺少SDL库或者在配置时没有使能SDL所导致的默认的vnc viewer无法形成可视化界面，所以这里我们预先安装：
+\begin{lstlisting}
+$ sudo apt-get install libsdl2-dev
+\end{lstlisting}
+\subsection{编译安装QEMU}
+首先使用 ./configure 配置编译选项，用于生成 Makefile ，可以通过命令 \textbf{\color[RGB]{100,100,235}{./configure --help}} 查看可用选项。
+注意到编译时可以指定 QEMU 支持的架构，其余的可以不编译，这样可以减少编译时间。
+\begin{lstlisting}[breaklines=true]
+$ ./configure --enable-kvm --enable-debug --enable-vnc --enable-werror --enable-sdl --target-list="x86_64-softmmu"
+\end{lstlisting}
+这里指定了x86\_64架构，同时显式地使其支持 \textbf{KVM} 和 \textbf{vnc}，编译时将 warning 当做 error 处理，以及开启 SDL 支持。
+
+配置完成后，在输出信息中确认已经有 SDL 支持。下面直接编译安装即可。
+\begin{lstlisting}
+$ make -j8
+$ make install
+\end{lstlisting}
+\section{创建虚拟机并配置网络}
+\subsection{检查KVM是否可用}
+可以采用如下命令检查:
+\begin{lstlisting}
+$ grep -E 'vmx|svm' /proc/cpuinfo
+$ lsmod | grep kvm
+\end{lstlisting}
+有输出即可。比如第二个命令的输出类似于：
+\begin{lstlisting}
+kvm_intel           *****   0
+kvm                 *****   1   kvm_intel
+\end{lstlisting}
+\subsection{创建虚拟机并安装操作系统}
+首先创建虚拟机镜像文件：
+\begin{lstlisting}
+$ qemu-img create -f qcow2 ubuntu.img 30G
+$ qemu-img create -f qcow2 ubunntu3.img 30G
+\end{lstlisting}
+然后启动虚拟机并安装操作系统，为加以区分，虚拟机的操作系统使用 ubuntu-20.04.3， 同样从官网下载镜像(\url{https://ubuntu.com/download/desktop})
+\begin{lstlisting}[breaklines=true]
+$ qemu-system-x86_64 -m 4096 ubuntu.img -enable-kvm -cdrom ./ubuntu-20.04.3-desktop-amd64.iso
+$ qemu-system-x86_64 -m 4096 ubuntu3.img -enable-kvm -cdrom ./ubuntu-20.04.3-desktop-amd64.iso
+\end{lstlisting}
+安装虚拟机过程如图 4所示：
+\begin{figure}[H]
+    \centering
+    \subfigure[pic1.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{picture/3.png}
+    \label{4-1}
+    %\caption{fig1}
+    \end{minipage}%
+    }%
+    \subfigure[pic2.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{picture/4.png}
+    %\caption{fig2}
+    \end{minipage}%
+    }%
+    \subfigure[pic3.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{picture/5.png}
+    %\caption{fig2}
+    \end{minipage}
+    }%
+    \subfigure[pic4.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{picture/8.png}
+    %\caption{fig2}
+    \end{minipage}
+    }%
+
+    \subfigure[pic5.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{picture/9.png}
+    %\caption{fig1}
+    \end{minipage}%
+    }%
+    \subfigure[pic6.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{picture/11.png}
+    %\caption{fig2}
+    \end{minipage}%
+    }%
+    \subfigure[pic7.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{picture/12.png}
+    %\caption{fig2}
+    \end{minipage}
+    }%
+    \subfigure[pic8.]{
+    \begin{minipage}[t]{0.25\linewidth}
+    \centering
+    \includegraphics[width=1.5in]{picture/13.png}
+    %\caption{fig2}
+    \end{minipage}
+    }
+    \label{fig3}
+    \caption{虚拟机安装过程}
+\end{figure}%/
+\subsection{配置tap网络}
+学习并了解了相关知识(\url{https://wiki.qemu.org/Documentation/Networking})，tap 网络模式是在主机中创建网桥和tap设备，然后使网桥连接主机的网卡和tap设备，再通过指定的tap设备和虚拟机的虚拟网卡相连接，达到访问外部网络的目的（tap设备是在数据链路层模拟的）这种连接模式会为虚拟机分配一个独立的局域网IP地址。
+
+这里会用到一些网络相关的工具，如下安装：
+\begin{lstlisting}
+$ sudo apt-get install net-tools
+$ sudo apt-get install ethtool
+\end{lstlisting}
+使用 \textbf{\color[RGB]{100,100,235}{ifconig}} 查看网络设备如\autoref{5-1}所示
+\begin{figure}[H]
+    \centering
+    \subfigure[pic1.]{
+        \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=2.8in]{picture/15.png}
+        \label{5-1}
+        %\caption{fig1}
+        \end{minipage}%
+        }%
+        \subfigure[pic2.]{
+        \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=2.8in]{picture/16.png}
+        \label{5-2}
+        %\caption{fig2}
+        \end{minipage}%
+        }%
+    \label{ifconfig}
+    \caption{查看主机网络设备}
+\end{figure}
+下面在主机创建网桥和两个tap设备，先安装所需工具
+\begin{lstlisting}
+$ sudo apt-get install bridge-utils
+$ sudo apt-get install iproute2
+\end{lstlisting}
+然后创建网桥、tap设备、网桥分别与主机有线网卡和tap设备相连、并为网桥分配 IP
+\begin{lstlisting}
+$ modprobe tun tap #make sure module has built-in
+$ ip link add br0 type bridge
+$ ip tuntap add dev tap0 mode tap
+$ ip tuntap add dev tap1 mode tap
+$ ip link set dev enp4s0 master br0
+$ ip link set dev tap0 master br0
+$ ip link set dev tap1 master br0
+$ ip link set dev br0 up
+$ dhclient br0
+$ ifconfig tap0 up
+$ ifconfig tap1 up
+\end{lstlisting}
+再次通过 \textbf{\color[RGB]{100,100,235}{ifconfig}} 查看网络设备如\autoref{5-2}所示，通过命令 \textbf{\color[RGB]{100,100,235}{brctl show}} 查看网桥连接状态：
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{picture/25.png}
+    \label{fig6}
+    \caption{网桥连接情况}
+\end{figure}
+\subsection{启动虚拟机并配置网络}
+执行如下命令启动虚拟机：
+\begin{lstlisting}[breaklines=true]
+$ qemu-system-x86_64 -m 4096 ubuntu.img -netdev tap,id=mynet0,ifname=tap0,script=no,downscript=no -device e1000,netdev=mynet0,mac=52:55:00:d1:55:01 -enable-kvm
+$ qemu-system-x86_64 -m 4096 ubuntu3.img -netdev tap,id=mynet0,ifname=tap1,script=no,downscript=no -device virtio-net-pci,netdev=mynet0,mac=52:55:00:d1:55:02 -enable-kvm
+\end{lstlisting}
+主机的机器名字为 \textbf{ykx-ubuntu}，两个虚拟机的名字分别为 \textbf{ykx-vm1, ykx-vm3}，用来区分。
+
+在两个虚拟机中分别安装工具 \textbf{net-tools} 和 \textbf{ethtool}，分别查看网络设备和网卡信息，如图\autoref{7-1}、\autoref{7-2}、\autoref{7-3}、\autoref{7-4}所示。
+\begin{figure}[H]
+    \centering
+    \subfigure[vm1]{
+        \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=2.8in]{picture/17.png}
+        \label{7-1}
+        %\caption{fig1}
+        \end{minipage}%
+        }%
+        \subfigure[vm3]{
+        \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=2.8in]{picture/21.png}
+        \label{7-2}
+        %\caption{fig2}
+        \end{minipage}%
+        }%
+
+        \subfigure[vm1-e1000]{
+            \begin{minipage}[t]{0.5\linewidth}
+            \centering
+            \includegraphics[width=2.8in]{picture/18.png}
+            \label{7-3}
+            %\caption{fig1}
+            \end{minipage}%
+            }%
+            \subfigure[vm3-virtio]{
+            \begin{minipage}[t]{0.5\linewidth}
+            \centering
+            \includegraphics[width=2.8in]{picture/22.png}
+            \label{7-4}
+            %\caption{fig2}
+            \end{minipage}%
+            }%
+    \label{vmifconfig}
+    \caption{查看虚拟机网络设备和网卡信息}
+\end{figure}
+\subsection{通过ssh连接虚拟机或者主机} \label{section4.5}
+分别在主机和两个虚拟机中安装 \textbf{ssh}，下图展示主机连接 \textbf{ykx-vm3} 和 \textbf{ykx-vm3} 连接主机。
+\begin{figure}[H]
+    \centering
+    \subfigure[主机连接虚拟机]{
+        \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=2.8in]{picture/27.png}
+        \label{8-1}
+        %\caption{fig1}
+        \end{minipage}%
+        }%
+        \subfigure[虚拟机连接主机]{
+        \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=2.8in]{picture/28.png}
+        \label{8-2}
+        %\caption{fig2}
+        \end{minipage}%
+        }%
+    \label{ssh}
+    \caption{ssh连接}
+\end{figure}
+\section{网络性能测试和比较}
+\subsection{连接外网}
+在 \autoref{section4.5} 中已经成功通过 ssh 从主机连接虚拟机以及从虚拟机连接主机。再测试虚拟机是否可以访问外网
+\begin{figure}[H]
+    \centering
+    \subfigure[vm1]{
+        \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=2.8in]{picture/20.png}
+        \label{9-1}
+        %\caption{fig1}
+        \end{minipage}%
+        }%
+        \subfigure[vm3]{
+        \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=2.8in]{picture/24.png}
+        \label{9-2}
+        %\caption{fig2}
+        \end{minipage}%
+        }%
+    \label{ssh}
+    \caption{虚拟机连接外网}
+\end{figure}
+\subsection{测试虚拟机到主机的网络性能，并进行比较}
+因为虚拟机访问外网都是通过主机的网卡，所以为比较两种虚拟网卡设备的性能，我们分别测试两个虚拟机到主机的速度来比较。
+这里使用 iperf 工具来测试网络性能，在主机和虚拟机中分别安装 iperf 工具，(\textbf{\color[RGB]{100,100,235}{sudo apt-get install iperf3}})。使用方法参考 \url{https://www.cnblogs.com/saneri/p/11169926.html}
+
+首先以主机作为服务端监听一个窗口：
+\begin{lstlisting}
+$ iperf3 -s -p 8080
+\end{lstlisting}
+
+然后分别在两个虚拟机上测试与主机的连接：
+\begin{lstlisting}
+$ iperf3 -c 192.168.1.131 -p 8080 -i 1
+\end{lstlisting}
+测试结果如下图所示：
+\begin{figure}[H]
+    \centering
+    \subfigure[vm1]{
+        \begin{minipage}[t]{0.33\linewidth}
+        \centering
+        \includegraphics[width=2in]{picture/19.png}
+        \label{10-1}
+        %\caption{fig1}
+        \end{minipage}%
+        }%
+        \subfigure[vm3]{
+        \begin{minipage}[t]{0.33\linewidth}
+        \centering
+        \includegraphics[width=2in]{picture/23.png}
+        \label{10-2}
+        %\caption{fig2}
+        \end{minipage}%
+        }%
+        \subfigure[server]{
+        \begin{minipage}[t]{0.33\linewidth}
+        \centering
+        \includegraphics[width=2in]{picture/26.png}
+        \label{10-2}
+        %\caption{fig2}
+        \end{minipage}%
+        }%
+    \label{iperf3}
+    \caption{比较网络性能}
+\end{figure}
+总结如\autoref{tab1}：
+\begin{table}[H]
+    \centering
+    \caption{比较结果}
+    \begin{tabular}{c|c}
+    \hline
+    & Bitrate \\
+    \hline
+    e1000 & 1.27 Gbits/sec \\
+    virtio-net & 23.0 Gbits/sec  \\
+    \hline       
+    \end{tabular}
+    \label{tab1}
+\end{table}
+即 virtio-net 的性能远好于 e1000
+\section{补充}
+\subsection{关于与无线网卡的网桥连接}
+参考 \url{https://wiki.qemu.org/Documentation/Networking/NAT}，在这部分内容中介绍了建立网桥连接无向网卡的方法，这里提供了一个脚本来代替命令行参数设定来启动虚拟机。
+\subsection{virt-manager尝试}
+virt-manager 是一个虚拟机管理器，提供了图形化界面来创建和管理虚拟机，通过它可以便捷地创建虚拟机。但是在使用的时候，它会默认使用 qemu-system-i386 的模拟器来创建虚拟机，这个默认设置需要通过在软件内改写 XML
+来设置。另一方面，在用其创建虚拟机时对网络的设置时，如果想要使用在命令行创建的网桥，也要修改 XML 来设置，但在我的尝试下，它无法识别我在主机创建的tap设备。
+
+\section{心得体会}
+在这项大作业中，经历过诸多试错过程，最终完成了全部的内容。在此期间了解了更多的网络设备虚拟化的知识和 qemu 的使用，对 linux 系统的使用更加得心应手 (双系统重装了一次)。另一方面，在配置虚拟机的网络时，对虚拟机连接网络的各种方式都作以了解和学习，同时联系计算机网络课程中学到的知识，对这项作业帮助很多。
+
+
+\end{document} 
